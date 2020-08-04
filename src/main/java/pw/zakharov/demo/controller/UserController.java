@@ -2,7 +2,6 @@ package pw.zakharov.demo.controller;
 
 import org.springframework.data.domain.Range;
 import org.springframework.web.bind.annotation.*;
-import pw.zakharov.demo.model.Question;
 import pw.zakharov.demo.model.User;
 import pw.zakharov.demo.service.UserService;
 
@@ -36,14 +35,17 @@ public class UserController {
     }
 
     @GetMapping(value = "/list")
-    public List<User> getAll(@RequestParam(value = "grade") byte grade) {
-        return userService.getUsers(grade);
+    public List<User> getAll(@RequestParam(value = "grade", required = false, defaultValue = "all") String grade) {
+        if (grade.equalsIgnoreCase("all")) {
+            return userService.getUsers();
+        }
+        return userService.getUsers(Byte.parseByte(grade));
     }
 
-    @GetMapping(value = "/addQuestion")
+    @PostMapping(value = "/addQuestion")
     public void addQuestion(@RequestParam(value = "questionId") Long userId,
                             @RequestParam(value = "questionId") Long questionId) {
-        userService.
+        userService.updateQuestions(userId, questionId);
     }
 
 }

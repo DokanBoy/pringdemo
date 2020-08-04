@@ -3,6 +3,7 @@ package pw.zakharov.demo.service;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import pw.zakharov.demo.exception.UnknownUserException;
+import pw.zakharov.demo.model.Question;
 import pw.zakharov.demo.model.User;
 import pw.zakharov.demo.repository.UserRepository;
 
@@ -19,9 +20,11 @@ import java.util.stream.StreamSupport;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final QuestionService questionService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, QuestionService questionService) {
         this.userRepository = userRepository;
+        this.questionService = questionService;
     }
 
     @Override
@@ -38,6 +41,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getUsers() {
+        return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<User> getUsers(byte grade) {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
                 .filter(user -> user.getGrade() == grade)
@@ -45,10 +54,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addQuestion(Long userId, Long questionId) {
-        Optional<User> user = userRepository.findById(userId);
+    @SneakyThrows
+    public void updateQuestions(Long userId, Long questionId) {
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UnknownUserException("Can't find user with this id"));
+        Question question = questionService.getQuestion(questionId);
 
-        
+        user.getActiveQuestions().add(question);
+
+        userRepository.deleteById(userId);
+        userRepository.save(user);
     }
 
 }

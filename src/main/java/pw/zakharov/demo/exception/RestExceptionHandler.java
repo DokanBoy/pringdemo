@@ -23,4 +23,5 @@ public class RestExceptionHandler {
     public UnknownQuestionException unknownUserException(UnknownQuestionException exception) {
         return exception;
     }
+
 }

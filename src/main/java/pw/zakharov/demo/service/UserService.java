@@ -14,7 +14,10 @@ public interface UserService {
 
     User getUser(Long id);
 
+    List<User> getUsers();
+
     List<User> getUsers(byte grade);
 
-    void addQuestion(Long userId, Long questionId);
+    void updateQuestions(Long userId, Long questionId);
+
 }
